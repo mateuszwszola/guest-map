@@ -1,6 +1,6 @@
 import React from 'react';
 import Head from 'next/head';
-import { Button, useColorMode, Box, Flex, Heading } from '@chakra-ui/core';
+import { useColorMode, Box, Flex, Heading, IconButton } from '@chakra-ui/core';
 import Map from '../components/map';
 
 export default function Home() {
@@ -13,15 +13,21 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <Box as="main">
-        <Flex justify="center" align="center" my="4">
-          <Heading as="h1">Welcome to Guest Map App!</Heading>
-          <Button ml="2" onClick={toggleColorMode}>
-            Toggle {colorMode === 'light' ? 'Dark' : 'Light'}
-          </Button>
+      <Flex as="main" h="100%" direction="column">
+        <Flex justify="center" align="center" p={2}>
+          <Heading as="h1" textAlign="center">
+            Welcome to Guest Map App!
+          </Heading>
+          <Box ml={2}>
+            <IconButton
+              icon={colorMode === 'dark' ? 'moon' : 'sun'}
+              aria-label="Toggle theme"
+              onClick={toggleColorMode}
+            />
+          </Box>
         </Flex>
         <Map />
-      </Box>
+      </Flex>
     </Box>
   );
 }

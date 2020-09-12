@@ -1,26 +1,41 @@
 import React, { useState } from 'react';
-import { Box } from '@chakra-ui/core';
-import MapGL from 'react-map-gl';
+import { Box, useColorMode } from '@chakra-ui/core';
+import MapGL, { GeolocateControl } from 'react-map-gl';
 
 function Map() {
+  const { colorMode } = useColorMode();
   const [viewport, setViewport] = useState({
     latitude: 52.2297,
     longitude: 21.0122,
     zoom: 14,
-    bearing: 0,
-    pitch: 0,
   });
 
+  const mapStyle = {
+    light: 'mapbox://styles/mapbox/streets-v11',
+    dark: 'mapbox://styles/mapbox/dark-v10',
+  };
+
   return (
-    <Box>
+    <Box flex="1" h="100%">
       <MapGL
         {...viewport}
-        width="100vw"
-        height="100vh"
-        mapStyle="mapbox://styles/mapbox/dark-v9"
+        width="100%"
+        height="100%"
+        mapStyle={mapStyle[colorMode]}
         onViewportChange={(nextViewport) => setViewport(nextViewport)}
         mapboxApiAccessToken={process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}
-      />
+      >
+        <GeolocateControl
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            margin: 10,
+          }}
+          positionOptions={{ enableHighAccuracy: true }}
+          trackUserLocation={true}
+        />
+      </MapGL>
     </Box>
   );
 }
