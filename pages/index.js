@@ -3,7 +3,7 @@ import Head from 'next/head';
 import { useColorMode, Box, Flex, IconButton, Text } from '@chakra-ui/core';
 import { SiOpenstreetmap } from 'react-icons/si';
 import { FiSun, FiMoon } from 'react-icons/fi';
-import Map from '../components/map';
+import Map from '../components/Map';
 
 export default function Home() {
   const { colorMode, toggleColorMode } = useColorMode();
