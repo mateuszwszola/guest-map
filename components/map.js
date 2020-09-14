@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Box, Flex, Button, useColorMode, useDisclosure, Spinner, useToast } from '@chakra-ui/core';
 import MapGL, { GeolocateControl } from 'react-map-gl';
 import MessageForm from '../components/map/MessageForm';
@@ -30,11 +30,51 @@ function Map() {
     longitude: 18.0084,
     zoom: 0,
   });
+  const userLocation = useRef(null);
+  const [userLocationLoading, setUserLocationLoading] = useState(false);
+
+  useEffect(() => {
+    if (!isMsgFormVisible || !!userLocation.current) return;
+
+    setUserLocationLoading(true);
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { longitude, latitude } = position.coords;
+        userLocation.current = { longitude, latitude };
+
+        setViewport((v) => ({
+          ...v,
+          longitude,
+          latitude,
+          zoom: 12,
+        }));
+        setUserLocationLoading(false);
+      },
+      () => {
+        toast({
+          title: 'An error occurred.',
+          description: 'Unable to retrieve your location',
+          status: 'error',
+          duration: 9000,
+          isClosable: true,
+        });
+        setUserLocationLoading(false);
+      }
+    );
+  }, [isMsgFormVisible]);
+
+  const onMessageFormSubmit = (e) => {
+    e.preventDefault();
+
+    console.log('The form has been submitted');
+    console.log('User location', userLocation.current);
+  };
 
   return (
     <>
       {status === 'loading' && (
-        <Spinner size="xl" pos="absolute" top="50%" left="50%" transform="translate(-50%, -50%)" />
+        <Spinner zIndex="100" size="xl" pos="absolute" top="50%" left="50%" transform="translate(-50%, -50%)" />
       )}
       <Box flex="1" h="100%">
         <MapGL
@@ -52,7 +92,9 @@ function Map() {
             <Button onClick={onMsgFormToggle} alignSelf="flex-end" m="10px">
               {isMsgFormVisible ? 'Hide form' : 'Add message'}
             </Button>
-            <Box px={2}>{isMsgFormVisible && <MessageForm />}</Box>
+            <Box px={2}>
+              {isMsgFormVisible && <MessageForm handleSubmit={onMessageFormSubmit} isLoading={userLocationLoading} />}
+            </Box>
           </Flex>
           {messages &&
             Array.isArray(messages) &&
