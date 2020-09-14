@@ -1,9 +1,14 @@
 import { connectToDatabase } from '../../../utils/mongodb';
 
 export default async (req, res) => {
-  const { db } = await connectToDatabase();
+  try {
+    const { db } = await connectToDatabase();
 
-  const shipwrecks = await db.collection('shipwrecks').find({}).limit(20).toArray();
+    const messages = await db.collection('messages').find({}).limit(100).toArray();
 
-  res.json({ shipwrecks });
+    res.json({ messages });
+  } catch (err) {
+    res.status(err.statusCode || 500);
+    res.json({ error: err.message || 'Unable to get messages' });
+  }
 };

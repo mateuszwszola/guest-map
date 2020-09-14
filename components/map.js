@@ -48,14 +48,12 @@ function Map() {
         <Box pos="absolute" top="0" left="0" margin="10px">
           <GeolocateControl positionOptions={{ enableHighAccuracy: true }} trackUserLocation={true} />
         </Box>
-        <Box pos="absolute" top="0" right="0" m="10px" w="full" maxWidth="sm">
-          <Flex direction="column">
-            <Button onClick={onMsgFormToggle} alignSelf="flex-end">
-              {isMsgFormVisible ? 'Hide form' : 'Add message'}
-            </Button>
-            {isMsgFormVisible && <MessageForm />}
-          </Flex>
-        </Box>
+        <Flex direction="column" pos="absolute" top="0" right="0" w="full" maxWidth={['100%', 'sm']}>
+          <Button onClick={onMsgFormToggle} alignSelf="flex-end" m="10px">
+            {isMsgFormVisible ? 'Hide form' : 'Add message'}
+          </Button>
+          <Box px={2}>{isMsgFormVisible && <MessageForm />}</Box>
+        </Flex>
         {/* <Marker longitude={21} latitude={52} offsetLeft={-20} offsetTop={-10}>
           <FaMapMarkerAlt />
         </Marker> */}
