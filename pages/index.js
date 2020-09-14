@@ -1,6 +1,8 @@
 import React from 'react';
 import Head from 'next/head';
-import { useColorMode, Box, Flex, Heading, IconButton } from '@chakra-ui/core';
+import { useColorMode, Box, Flex, IconButton, Text } from '@chakra-ui/core';
+import { SiOpenstreetmap } from 'react-icons/si';
+import { FiSun, FiMoon } from 'react-icons/fi';
 import Map from '../components/map';
 
 export default function Home() {
@@ -14,15 +16,18 @@ export default function Home() {
       </Head>
 
       <Flex as="main" h="100%" direction="column">
-        <Flex justify="center" align="center" p={2}>
-          <Heading as="h1" textAlign="center">
-            Welcome to Guest Map App!
-          </Heading>
+        <Flex justify="space-between" align="center" w="full" maxW="1200px" mx="auto" p={2}>
+          <Box as="h1" display="flex" alignItems="center" fontSize="2xl" fontWeight="bold">
+            <SiOpenstreetmap />
+            <Text as="span" ml={1} textTransform="uppercase" letterSpacing="tighter">
+              GuestMap
+            </Text>
+          </Box>
           <Box ml={2}>
             <IconButton
-              icon={colorMode === 'dark' ? 'moon' : 'sun'}
-              aria-label="Toggle theme"
               onClick={toggleColorMode}
+              aria-label="Toggle theme"
+              icon={colorMode === 'dark' ? <FiMoon /> : <FiSun />}
             />
           </Box>
         </Flex>

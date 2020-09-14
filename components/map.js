@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Box, useColorMode } from '@chakra-ui/core';
-import MapGL, { GeolocateControl } from 'react-map-gl';
+import MapGL, { GeolocateControl, Marker } from 'react-map-gl';
+import { FaMapMarkerAlt } from 'react-icons/fa';
 
 function Map() {
   const { colorMode } = useColorMode();
@@ -35,6 +36,9 @@ function Map() {
           positionOptions={{ enableHighAccuracy: true }}
           trackUserLocation={true}
         />
+        <Marker longitude={21} latitude={52} offsetLeft={-20} offsetTop={-10}>
+          <FaMapMarkerAlt />
+        </Marker>
       </MapGL>
     </Box>
   );
