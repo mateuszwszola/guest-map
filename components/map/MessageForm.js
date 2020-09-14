@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Box, Flex, Text, FormControl, FormLabel, Input, Button, Textarea } from '@chakra-ui/core';
 import { Spinner } from '@chakra-ui/core';
 
-function MessageForm({ handleSubmit, isLoading }) {
+function MessageForm({ onSubmit, isLoading }) {
+  const [identity, setIdentity] = useState('');
+  const [message, setMessage] = useState('');
+
   return (
     <Box pos="relative" mt={4}>
       {isLoading && (
@@ -22,14 +25,26 @@ function MessageForm({ handleSubmit, isLoading }) {
           <Text>Loading user location...</Text>
         </Flex>
       )}
-      <Box opacity={isLoading ? '0.75' : '1'} onSubmit={handleSubmit} as="form">
+      <Box opacity={isLoading ? '0.75' : '1'} onSubmit={onSubmit({ identity, message })} as="form">
         <FormControl id="identity">
           <FormLabel>Display name</FormLabel>
-          <Input type="text" name="identity" placeholder="Enter your name" />
+          <Input
+            value={identity}
+            onChange={(e) => setIdentity(e.target.value)}
+            type="text"
+            name="identity"
+            placeholder="Enter your name"
+          />
         </FormControl>
         <FormControl id="message" mt={2}>
           <FormLabel>Message</FormLabel>
-          <Textarea type="text" name="message" placeholder="Enter a message" />
+          <Textarea
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            type="text"
+            name="message"
+            placeholder="Enter a message"
+          />
         </FormControl>
         <Button mt={4} w="full" type="submit">
           Add a message
@@ -40,7 +55,7 @@ function MessageForm({ handleSubmit, isLoading }) {
 }
 
 MessageForm.propTypes = {
-  handleSubmit: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired,
   isLoading: PropTypes.bool.isRequired,
 };
 

@@ -14,6 +14,7 @@ export default async (req, res) => {
         displayName: identity,
       },
       location: {
+        type: 'Point',
         geo: [longitude, latitude],
       },
       createdAt: new Date(),

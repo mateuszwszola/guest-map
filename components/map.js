@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Box, Flex, Button, useColorMode, useDisclosure, Spinner, useToast } from '@chakra-ui/core';
 import MapGL, { GeolocateControl } from 'react-map-gl';
+import { Box, Flex, Button, useColorMode, useDisclosure, Spinner, useToast } from '@chakra-ui/core';
 import MessageForm from '../components/map/MessageForm';
 import CustomMarker from '../components/map/CustomMarker';
-import { useMessages } from '../utils/messages';
+import { useMessages, useCreateMessage } from '../utils/messages';
 
 const mapStyle = {
   light: 'mapbox://styles/mapbox/streets-v11',
@@ -12,13 +12,16 @@ const mapStyle = {
 
 function Map() {
   const { colorMode } = useColorMode();
-  const { isOpen: isMsgFormVisible, onToggle: onMsgFormToggle } = useDisclosure();
   const toast = useToast();
+  const userLocation = useRef(null);
+  const [userLocationLoading, setUserLocationLoading] = useState(false);
+  const { isOpen: isMsgFormVisible, onToggle: onMsgFormToggle, onClose: onMsgFormClose } = useDisclosure();
+  const [createMessage] = useCreateMessage();
   const { status, data: messages } = useMessages({
     onError: (err) => {
       toast({
         title: 'An error occurred.',
-        description: err.message || 'Unable to fetch messages',
+        description: err?.message || 'Unable to fetch messages',
         status: 'error',
         duration: 9000,
         isClosable: true,
@@ -30,8 +33,6 @@ function Map() {
     longitude: 18.0084,
     zoom: 0,
   });
-  const userLocation = useRef(null);
-  const [userLocationLoading, setUserLocationLoading] = useState(false);
 
   useEffect(() => {
     if (!isMsgFormVisible || !!userLocation.current) return;
@@ -64,17 +65,46 @@ function Map() {
     );
   }, [isMsgFormVisible]);
 
-  const onMessageFormSubmit = (e) => {
+  const onMessageFormSubmit = (formData) => (e) => {
     e.preventDefault();
+    if (!formData.identity || !formData.message || !userLocation.current) return;
 
-    console.log('The form has been submitted');
-    console.log('User location', userLocation.current);
+    createMessage(
+      {
+        identity: formData.identity,
+        message: formData.message,
+        ...userLocation.current,
+      },
+      {
+        onSuccess: () => {
+          toast({
+            title: 'Message created.',
+            description: "We've created your message for you.",
+            status: 'success',
+            duration: 9000,
+            isClosable: true,
+          });
+        },
+        onError: (err) => {
+          toast({
+            title: 'An error occurred.',
+            description: err?.message || 'Unable to add your message',
+            status: 'error',
+            duration: 9000,
+            isClosable: true,
+          });
+        },
+        onSettled: () => {
+          onMsgFormClose();
+        },
+      }
+    );
   };
 
   return (
     <>
       {status === 'loading' && (
-        <Spinner zIndex="100" size="xl" pos="absolute" top="50%" left="50%" transform="translate(-50%, -50%)" />
+        <Spinner zIndex={2} size="xl" pos="absolute" top="50%" left="50%" transform="translate(-50%, -50%)" />
       )}
       <Box flex="1" h="100%">
         <MapGL
@@ -89,11 +119,11 @@ function Map() {
             <GeolocateControl positionOptions={{ enableHighAccuracy: true }} trackUserLocation={true} />
           </Box>
           <Flex direction="column" pos="absolute" top="0" right="0" w="full" maxWidth={['100%', 'sm']}>
-            <Button onClick={onMsgFormToggle} alignSelf="flex-end" m="10px">
+            <Button disabled={userLocationLoading} onClick={onMsgFormToggle} alignSelf="flex-end" m="10px">
               {isMsgFormVisible ? 'Hide form' : 'Add message'}
             </Button>
             <Box px={2}>
-              {isMsgFormVisible && <MessageForm handleSubmit={onMessageFormSubmit} isLoading={userLocationLoading} />}
+              {isMsgFormVisible && <MessageForm onSubmit={onMessageFormSubmit} isLoading={userLocationLoading} />}
             </Box>
           </Flex>
           {messages &&
