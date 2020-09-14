@@ -1,15 +1,34 @@
 import React, { useState } from 'react';
-import { Box, useColorMode } from '@chakra-ui/core';
+import { Box, Flex, Button, useColorMode, Input, FormControl, FormLabel, useDisclosure } from '@chakra-ui/core';
 import MapGL, { GeolocateControl, Marker } from 'react-map-gl';
 import { FaMapMarkerAlt } from 'react-icons/fa';
+
+function MessageForm() {
+  return (
+    <Box as="form" mt={4}>
+      <FormControl id="identity">
+        <FormLabel>Display name</FormLabel>
+        <Input type="text" name="identity" placeholder="Enter your name" />
+      </FormControl>
+      <FormControl id="message" mt={2}>
+        <FormLabel>Message</FormLabel>
+        <Input type="text" name="identity" placeholder="Enter a message" />
+      </FormControl>
+      <Button mt={4} w="full" type="submit">
+        Add a message
+      </Button>
+    </Box>
+  );
+}
 
 function Map() {
   const { colorMode } = useColorMode();
   const [viewport, setViewport] = useState({
-    latitude: 52.2297,
-    longitude: 21.0122,
-    zoom: 14,
+    latitude: 53.1235,
+    longitude: 18.0084,
+    zoom: 0,
   });
+  const { isOpen: isMsgFormVisible, onToggle: onMsgFormToggle } = useDisclosure();
 
   const mapStyle = {
     light: 'mapbox://styles/mapbox/streets-v11',
@@ -26,19 +45,20 @@ function Map() {
         onViewportChange={(nextViewport) => setViewport(nextViewport)}
         mapboxApiAccessToken={process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}
       >
-        <GeolocateControl
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            margin: 10,
-          }}
-          positionOptions={{ enableHighAccuracy: true }}
-          trackUserLocation={true}
-        />
-        <Marker longitude={21} latitude={52} offsetLeft={-20} offsetTop={-10}>
+        <Box pos="absolute" top="0" left="0" margin="10px">
+          <GeolocateControl positionOptions={{ enableHighAccuracy: true }} trackUserLocation={true} />
+        </Box>
+        <Box pos="absolute" top="0" right="0" m="10px" w="full" maxWidth="sm">
+          <Flex direction="column">
+            <Button onClick={onMsgFormToggle} alignSelf="flex-end">
+              {isMsgFormVisible ? 'Hide form' : 'Add message'}
+            </Button>
+            {isMsgFormVisible && <MessageForm />}
+          </Flex>
+        </Box>
+        {/* <Marker longitude={21} latitude={52} offsetLeft={-20} offsetTop={-10}>
           <FaMapMarkerAlt />
-        </Marker>
+        </Marker> */}
       </MapGL>
     </Box>
   );

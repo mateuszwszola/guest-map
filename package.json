@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@chakra-ui/core": "next",
+    "mongodb": "^3.6.2",
     "next": "9.5.1",
     "react": "16.13.1",
     "react-dom": "16.13.1",
