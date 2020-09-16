@@ -4,9 +4,19 @@ export default async (req, res) => {
   try {
     const { db } = await connectToDatabase();
 
-    const {
-      message: { longitude, latitude, identity, message },
-    } = req.body;
+    const errors = {};
+    const requiredFields = ['longitude', 'latitude', 'identity', 'message'];
+    requiredFields.map((field) => {
+      if (!req.body[field]) {
+        errors[field] = field + ' is required';
+      }
+    });
+
+    if (Object.keys(errors).length > 0) {
+      return res.status(422).json({ errors });
+    }
+
+    const { message, identity, longitude, latitude } = req.body;
 
     const doc = await db.collection('messages').insertOne({
       message,

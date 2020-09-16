@@ -28,7 +28,13 @@ function MessageForm({ onSubmit, isLoading }) {
       <Box opacity={isLoading ? '0.75' : '1'} onSubmit={handleSubmit((data) => onSubmit(data))} as="form">
         <FormControl id="identity">
           <FormLabel>Display name</FormLabel>
-          <Input ref={register} name="identity" type="text" placeholder="Enter your name" />
+          <Input ref={register({ required: true })} name="identity" type="text" placeholder="Enter your name" />
+          {errors.identity && (
+            <Flex align="center" color="red.500" fontSize="sm">
+              <BiError />
+              Name is required
+            </Flex>
+          )}
         </FormControl>
         <FormControl id="message" mt={2}>
           <FormLabel>Message</FormLabel>

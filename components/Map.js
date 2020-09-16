@@ -42,7 +42,7 @@ function Map() {
         setActiveMessage(message);
       }
     },
-    [messages]
+    [messages, setActiveMessage]
   );
 
   useEffect(() => {
