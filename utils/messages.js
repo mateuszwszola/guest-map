@@ -10,8 +10,6 @@ export function useCreateMessage() {
     onMutate: (newMessage) => {
       queryCache.cancelQueries('messages');
 
-      console.log({ newMessage });
-
       const previousMessages = queryCache.getQueryData('messages');
 
       queryCache.setQueryData('messages', (old) => [

@@ -16,7 +16,7 @@ export default function Home() {
       </Head>
 
       <Flex as="main" h="100%" direction="column">
-        <Flex justify="space-between" align="center" w="full" maxW="1200px" mx="auto" p={2}>
+        <Flex justify="space-between" align="center" w="full" maxW="1280px" mx="auto" p={2}>
           <Box as="h1" display="flex" alignItems="center" fontSize="2xl" fontWeight="bold">
             <SiOpenstreetmap />
             <Text as="span" ml={1} textTransform="uppercase" letterSpacing="tighter">

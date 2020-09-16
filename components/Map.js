@@ -1,9 +1,10 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import MapGL, { GeolocateControl } from 'react-map-gl';
 import { Box, Flex, Button, useColorMode, useDisclosure, Spinner, useToast } from '@chakra-ui/core';
 import MessageForm from '../components/map/MessageForm';
 import CustomMarker from '../components/map/CustomMarker';
 import { useMessages, useCreateMessage } from '../utils/messages';
+import { useLocation } from '../utils/location';
 
 const mapStyle = {
   light: 'mapbox://styles/mapbox/streets-v11',
@@ -13,11 +14,10 @@ const mapStyle = {
 function Map() {
   const { colorMode } = useColorMode();
   const toast = useToast();
-  const userLocation = useRef(null);
-  const [userLocationLoading, setUserLocationLoading] = useState(false);
-  const { isOpen: isMsgFormVisible, onToggle: onMsgFormToggle, onClose: onMsgFormClose } = useDisclosure();
-  const [createMessage] = useCreateMessage();
-  const { status, data: messages } = useMessages({
+  const { location, status: locationStatus, getLocation } = useLocation();
+  const { isOpen: isMsgFormOpen, onToggle: onMsgFormToggle, onClose: onMsgFormClose } = useDisclosure();
+  const [createMessage, { isLoading: isAddingMessage }] = useCreateMessage();
+  const { status: messagesStatus, data: messages } = useMessages({
     onError: (err) => {
       toast({
         title: 'An error occurred.',
@@ -35,45 +35,40 @@ function Map() {
   });
 
   useEffect(() => {
-    if (!isMsgFormVisible || !!userLocation.current) return;
+    if (!isMsgFormOpen || !!location) return;
+    console.log('Effect runs');
 
-    setUserLocationLoading(true);
-
-    navigator.geolocation.getCurrentPosition(
+    getLocation(
       (position) => {
-        const { longitude, latitude } = position.coords;
-        userLocation.current = { longitude, latitude };
-
         setViewport((v) => ({
           ...v,
-          longitude,
-          latitude,
+          longitude: position.coords.longitude,
+          latitude: position.coords.latitude,
           zoom: 12,
         }));
-        setUserLocationLoading(false);
       },
-      () => {
+      (errMsg) => {
         toast({
           title: 'An error occurred.',
-          description: 'Unable to retrieve your location',
+          description: errMsg,
           status: 'error',
           duration: 9000,
           isClosable: true,
         });
-        setUserLocationLoading(false);
       }
     );
-  }, [isMsgFormVisible]);
+  }, [isMsgFormOpen, getLocation, location, toast]);
 
   const onMessageFormSubmit = (formData) => (e) => {
     e.preventDefault();
-    if (!formData.identity || !formData.message || !userLocation.current) return;
+
+    if (!formData.identity || !formData.message || !location) return;
 
     createMessage(
       {
         identity: formData.identity,
         message: formData.message,
-        ...userLocation.current,
+        ...location,
       },
       {
         onSuccess: () => {
@@ -103,7 +98,7 @@ function Map() {
 
   return (
     <>
-      {status === 'loading' && (
+      {messagesStatus === 'loading' && (
         <Spinner zIndex={2} size="xl" pos="absolute" top="50%" left="50%" transform="translate(-50%, -50%)" />
       )}
       <Box flex="1" h="100%">
@@ -119,11 +114,21 @@ function Map() {
             <GeolocateControl positionOptions={{ enableHighAccuracy: true }} trackUserLocation={true} />
           </Box>
           <Flex direction="column" pos="absolute" top="0" right="0" w="full" maxWidth={['100%', 'sm']}>
-            <Button disabled={userLocationLoading} onClick={onMsgFormToggle} alignSelf="flex-end" m="10px">
-              {isMsgFormVisible ? 'Hide form' : 'Add message'}
+            <Button
+              disabled={locationStatus === 'loading' || isAddingMessage}
+              onClick={onMsgFormToggle}
+              alignSelf="flex-end"
+              m="10px"
+            >
+              {isMsgFormOpen ? 'Hide form' : 'Add message'}
             </Button>
             <Box px={2}>
-              {isMsgFormVisible && <MessageForm onSubmit={onMessageFormSubmit} isLoading={userLocationLoading} />}
+              {isMsgFormOpen && (
+                <MessageForm
+                  onSubmit={onMessageFormSubmit}
+                  isLoading={locationStatus === 'loading' || isAddingMessage}
+                />
+              )}
             </Box>
           </Flex>
           {messages &&
