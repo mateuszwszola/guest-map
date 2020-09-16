@@ -21,7 +21,7 @@ CustomMarker.propTypes = {
 };
 
 CustomMarker.defaultProps = {
-  offsetLeft: -20,
+  offsetLeft: -5,
   offsetTop: -10,
 };
 

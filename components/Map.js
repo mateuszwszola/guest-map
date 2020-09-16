@@ -69,10 +69,8 @@ function Map() {
     );
   }, [isMsgFormOpen, getLocation, location, toast]);
 
-  const onMessageFormSubmit = (formData) => (e) => {
-    e.preventDefault();
-
-    if (!formData.identity || !formData.message || !location) return;
+  const onMessageFormSubmit = (formData) => {
+    if (!location) return;
 
     createMessage(
       {
