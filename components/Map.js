@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import MapGL, { GeolocateControl } from 'react-map-gl';
-import { Box, Flex, Button, useColorMode, useDisclosure, Spinner, useToast } from '@chakra-ui/core';
+import React, { useState, useEffect, useCallback } from 'react';
+import MapGL, { GeolocateControl, Popup } from 'react-map-gl';
+import { Box, Flex, Button, useColorMode, useDisclosure, Spinner, useToast, Text } from '@chakra-ui/core';
 import MessageForm from '../components/map/MessageForm';
-import CustomMarker from '../components/map/CustomMarker';
+import Markers from '../components/map/Markers';
 import { useMessages, useCreateMessage } from '../utils/messages';
 import { useLocation } from '../utils/location';
 
@@ -33,10 +33,20 @@ function Map() {
     longitude: 18.0084,
     zoom: 0,
   });
+  const [activeMessage, setActiveMessage] = useState(null);
+
+  const handleMarkerClick = useCallback(
+    (messageId) => () => {
+      const message = messages && messages.find((msg) => msg._id === messageId);
+      if (message) {
+        setActiveMessage(message);
+      }
+    },
+    [messages]
+  );
 
   useEffect(() => {
     if (!isMsgFormOpen || !!location) return;
-    console.log('Effect runs');
 
     getLocation(
       (position) => {
@@ -122,26 +132,32 @@ function Map() {
             >
               {isMsgFormOpen ? 'Hide form' : 'Add message'}
             </Button>
-            <Box px={2}>
-              {isMsgFormOpen && (
+            {isMsgFormOpen && (
+              <Box px={2}>
                 <MessageForm
                   onSubmit={onMessageFormSubmit}
                   isLoading={locationStatus === 'loading' || isAddingMessage}
                 />
-              )}
-            </Box>
+              </Box>
+            )}
           </Flex>
-          {messages &&
-            Array.isArray(messages) &&
-            messages.map((msg) => (
-              <CustomMarker
-                key={msg._id}
-                identity={msg.user?.displayName}
-                message={msg.message}
-                longitude={msg.location?.geo?.[0]}
-                latitude={msg.location?.geo?.[1]}
-              />
-            ))}
+          {messages && Array.isArray(messages) && <Markers data={messages} onMarkerClick={handleMarkerClick} />}
+          {!!activeMessage && (
+            <Popup
+              longitude={activeMessage.location?.geo?.[0]}
+              latitude={activeMessage.location?.geo?.[1]}
+              closeButton={false}
+              onClose={() => setActiveMessage(null)}
+              closeOnClick={true}
+              offsetTop={-12}
+              offsetLeft={-12}
+            >
+              <Box>
+                <Text color="black">{activeMessage.user.displayName}</Text>
+                <Text color="black">{activeMessage.message}</Text>
+              </Box>
+            </Popup>
+          )}
         </MapGL>
       </Box>
     </>
