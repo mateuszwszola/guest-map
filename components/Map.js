@@ -150,7 +150,7 @@ function Map() {
               onClose={() => setActiveMessage(null)}
               closeOnClick={true}
               offsetTop={-12}
-              offsetLeft={-12}
+              offsetLeft={-5}
             >
               <Box>
                 <Text color="black">{activeMessage.user.displayName}</Text>

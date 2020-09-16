@@ -8,8 +8,6 @@ export function useLocation() {
   const getLocation = (successCb, errorCb) => {
     if (status === 'loading') return;
 
-    console.log('gets location');
-
     setStatus('loading');
     setError(null);
 

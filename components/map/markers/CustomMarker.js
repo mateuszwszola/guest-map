@@ -2,11 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Marker } from 'react-map-gl';
 import { FaMapMarkerAlt } from 'react-icons/fa';
+import { IconButton } from '@chakra-ui/core';
 
 function CustomMarker({ onClick, longitude, latitude, offsetLeft, offsetTop }) {
   return (
     <Marker longitude={longitude} latitude={latitude} offsetLeft={offsetLeft} offsetTop={offsetTop}>
-      <FaMapMarkerAlt onClick={onClick} cursor="pointer" />
+      <IconButton variant="ghost" onClick={onClick} aria-label="show message" icon={<FaMapMarkerAlt />} />
     </Marker>
   );
 }
