@@ -40,5 +40,6 @@ export function useLocation() {
     status,
     getLocation,
     error,
+    setLocation,
   };
 }

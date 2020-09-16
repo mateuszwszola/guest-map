@@ -14,7 +14,7 @@ const mapStyle = {
 function Map() {
   const { colorMode } = useColorMode();
   const toast = useToast();
-  const { location, status: locationStatus, getLocation } = useLocation();
+  const { location, status: locationStatus, getLocation, setLocation } = useLocation();
   const { isOpen: isMsgFormOpen, onToggle: onMsgFormToggle, onClose: onMsgFormClose } = useDisclosure();
   const [createMessage, { isLoading: isAddingMessage }] = useCreateMessage();
   const { status: messagesStatus, data: messages } = useMessages({
@@ -106,6 +106,13 @@ function Map() {
     );
   };
 
+  const onGeolocate = (position) => {
+    const { longitude, latitude } = position.coords;
+    if (!location) {
+      setLocation({ longitude, latitude });
+    }
+  };
+
   return (
     <>
       {messagesStatus === 'loading' && (
@@ -121,7 +128,7 @@ function Map() {
           mapboxApiAccessToken={process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}
         >
           <Box pos="absolute" top="0" left="0" margin="10px">
-            <GeolocateControl positionOptions={{ enableHighAccuracy: true }} trackUserLocation={true} />
+            <GeolocateControl onGeolocate={onGeolocate} auto={!!location} />
           </Box>
           <Flex direction="column" pos="absolute" top="0" right="0" w="full" maxWidth={['100%', 'sm']}>
             <Button
